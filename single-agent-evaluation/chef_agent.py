@@ -5,12 +5,19 @@ import os
 import asyncio
 from typing import Annotated
 import json
+from pprint import pprint
 
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.agents import ChatCompletionAgent
 
-from azure.ai.evaluation import SKAgentConverter
+from azure.ai.evaluation import SKAgentConverter, evaluate
+from azure.ai.evaluation import (
+    ToolCallAccuracyEvaluator,
+    AzureOpenAIModelConfiguration,
+    IntentResolutionEvaluator,
+    TaskAdherenceEvaluator,
+)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -68,6 +75,40 @@ async def prepare_eval_data(agent, thread, turn_index, output_file):
     len(evaluation_data)  # number of turns in the thread
 
 
+def run_eval(data_file_name):
+
+    # Set up evaluators
+    model_config = AzureOpenAIModelConfiguration(
+        azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+        azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
+    )
+
+    intent_resolution = IntentResolutionEvaluator(model_config=model_config)
+
+    tool_call_accuracy = ToolCallAccuracyEvaluator(model_config=model_config)
+
+    task_adherence = TaskAdherenceEvaluator(model_config=model_config)
+
+    response = evaluate(
+        data=data_file_name,
+        evaluators={
+            "tool_call_accuracy": tool_call_accuracy,
+            "intent_resolution": intent_resolution,
+            "task_adherence": task_adherence,
+        },
+        azure_ai_project=os.environ["AZURE_AI_PROJECT"]
+        # azure_ai_project={
+        #     "subscription_id": os.environ["AZURE_SUBSCRIPTION_ID"],
+        #     "project_name": os.environ["PROJECT_NAME"],
+        #     "resource_group_name": os.environ["RESOURCE_GROUP_NAME"],
+        # },
+    )
+
+    pprint(f'AI Foundary URL: {response.get("studio_url")}')
+
+
 async def main():
     # Create the agent by directly providing the chat completion service
     agent = ChatCompletionAgent(
@@ -95,13 +136,16 @@ async def main():
     # Ensure the data directory exists
     data_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(data_dir, exist_ok=True)
+    output_file = os.path.join(data_dir, "evaluation_data.jsonl")
     
-    await prepare_eval_data(
-        agent=agent,
-        thread=thread,
-        turn_index=2,  # Specify the turn index you want to evaluate
-        output_file=os.path.join(data_dir, "evaluation_data.jsonl"),
-    )
+    # await prepare_eval_data(
+    #     agent=agent,
+    #     thread=thread,
+    #     turn_index=2,  # Specify the turn index you want to evaluate
+    #     output_file=output_file,
+    # )
+
+    run_eval(data_file_name=output_file)
 
 
 if __name__ == "__main__":
