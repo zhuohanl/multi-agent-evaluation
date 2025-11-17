@@ -138,14 +138,14 @@ async def main():
     os.makedirs(data_dir, exist_ok=True)
     output_file = os.path.join(data_dir, "evaluation_data.jsonl")
     
-    # await prepare_eval_data(
-    #     agent=agent,
-    #     thread=thread,
-    #     turn_index=2,  # Specify the turn index you want to evaluate
-    #     output_file=output_file,
-    # )
+    await prepare_eval_data(
+        agent=agent,
+        thread=thread,
+        turn_index=2,  # Specify the turn index you want to evaluate
+        output_file=output_file,
+    )
 
-    run_eval(data_file_name=output_file)
+    # run_eval(data_file_name=output_file)
 
 
 if __name__ == "__main__":
