@@ -99,11 +99,6 @@ def run_eval(data_file_name):
             "task_adherence": task_adherence,
         },
         azure_ai_project=os.environ["AZURE_AI_PROJECT"]
-        # azure_ai_project={
-        #     "subscription_id": os.environ["AZURE_SUBSCRIPTION_ID"],
-        #     "project_name": os.environ["PROJECT_NAME"],
-        #     "resource_group_name": os.environ["RESOURCE_GROUP_NAME"],
-        # },
     )
 
     pprint(f'AI Foundary URL: {response.get("studio_url")}')
