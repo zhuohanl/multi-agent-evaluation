@@ -94,6 +94,7 @@ Inside each evaluator (e.g., `IntentResolutionEvaluator`):
 
 ```
 1. Load a prompt template (intent_resolution.prompty)
+   Location: .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_intent_resolution\intent_resolution.prompty
    
 2. Fill in the template with your data:
    ┌─────────────────────────────────────────┐
@@ -158,12 +159,19 @@ Each evaluator has a `.prompty` file that contains instructions:
 IntentResolutionEvaluator:
 ├─ Prompt says: "Look at the query and response. Did the agent resolve the user's intent?"
 ├─ Inputs: query, response, tool_definitions
-└─ Ignores: grounded_truth (not in the prompt)
+├─ Ignores: grounded_truth (not in the prompt)
+└─ Location: .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_intent_resolution\intent_resolution.prompty
 
 ToolCallAccuracyEvaluator:
 ├─ Prompt says: "Look at tool calls and tool definitions. Are they correct?"
 ├─ Inputs: query, tool_calls, tool_definitions
-└─ Ignores: response, grounded_truth
+├─ Ignores: response, grounded_truth
+└─ Location: .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_tool_call_accuracy\tool_call_accuracy.prompty
+
+TaskAdherenceEvaluator:
+├─ Prompt says: "Does the response follow task requirements?"
+├─ Inputs: query, response, (optional: tool_definitions)
+└─ Location: .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_task_adherence\task_adherence.prompty
 ```
 
 ### **Q2: How does it pick up if it needs grounded_truth?**
@@ -541,3 +549,60 @@ response = evaluate(
 - **[Troubleshooting Guide](https://aka.ms/azureaieval-tsg)** - Common issues and solutions
 - **[Evaluation Samples](https://aka.ms/aistudio/eval-samples)** - Code examples and notebooks
 - **[Custom Evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/custom-evaluators)** - Build your own evaluators
+
+---
+
+## Prompty File Locations
+
+All evaluator prompt templates are stored in your virtual environment at:
+`.venv\Lib\site-packages\azure\ai\evaluation\_evaluators\`
+
+### **Your Current Evaluators:**
+
+1. **IntentResolutionEvaluator:**
+   ```
+   .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_intent_resolution\intent_resolution.prompty
+   ```
+
+2. **ToolCallAccuracyEvaluator:**
+   ```
+   .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_tool_call_accuracy\tool_call_accuracy.prompty
+   ```
+
+3. **TaskAdherenceEvaluator:**
+   ```
+   .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_task_adherence\task_adherence.prompty
+   ```
+
+### **Other Available Prompty Files:**
+- `coherence.prompty` - CoherenceEvaluator
+- `fluency.prompty` - FluencyEvaluator
+- `groundedness_with_query.prompty` - GroundednessEvaluator (with query)
+- `groundedness_without_query.prompty` - GroundednessEvaluator (without query)
+- `relevance.prompty` - RelevanceEvaluator
+- `response_completeness.prompty` - ResponseCompletenessEvaluator
+- `retrieval.prompty` - RetrievalEvaluator
+- `similarity.prompty` - SimilarityEvaluator
+- `task_completion.prompty` - TaskCompletionEvaluator
+- `tool_call_success.prompty` - ToolCallSuccessEvaluator
+
+### **How to View Prompty Files:**
+
+Open them directly in VS Code:
+```powershell
+# Intent Resolution prompt
+code .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_intent_resolution\intent_resolution.prompty
+
+# Tool Call Accuracy prompt
+code .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_tool_call_accuracy\tool_call_accuracy.prompty
+
+# Task Adherence prompt
+code .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_task_adherence\task_adherence.prompty
+```
+
+Or view them in the terminal:
+```powershell
+Get-Content .venv\Lib\site-packages\azure\ai\evaluation\_evaluators\_intent_resolution\intent_resolution.prompty
+```
+
+These files contain the exact prompt instructions that the LLM judge uses to evaluate your data!
